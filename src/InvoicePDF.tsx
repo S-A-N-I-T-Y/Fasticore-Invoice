@@ -22,19 +22,19 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   container: {
-    width: 450,
+    maxWidth: 350,
     margin: "0 auto",
     borderRadius: 8,
     border: "1px solid #e5e7eb",
   },
   header: {
-    backgroundColor: "#60a5fa", // blue-400
+    backgroundColor: "#60a5fa",
     padding: 10,
     display: "flex",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 4,
-    gap: 10,
   },
   companyName: {
     fontSize: 14,
@@ -49,9 +49,15 @@ const styles = StyleSheet.create({
     margin: 10,
     fontSize: 10,
     color: "#6b7280",
-    textAlign: "right",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
   },
-  row: {},
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   table: {
     width: "100%",
     marginVertical: 10,
@@ -61,24 +67,28 @@ const styles = StyleSheet.create({
   tableHeader: {
     backgroundColor: "#60a5fa",
     color: "white",
-    padding: 5,
+    padding: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   tableRow: {
     borderBottomWidth: 1,
     borderColor: "#e5e7eb",
-    padding: 5,
+    padding: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   tableCell: {
-    flex: 1,
     fontSize: 10,
-  },
-  tableCellRight: {
-    flex: 1,
-    textAlign: "right",
-    fontSize: 10,
+    width: "25%",
+    textAlign: "center",
   },
   section: {
     display: "flex",
+    flexDirection: "row",
     justifyContent: "space-between",
     margin: 10,
   },
@@ -94,10 +104,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   signatureBlock: {
-    marginTop: 20,
+    display: "flex",
+    flexDirection: "row",
+    margin: 10,
+    justifyContent: "flex-end",
+    textAlign: "center",
+  },
+  signature: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   signatureImg: {
-    width: 150,
+    width: 100,
     height: 40,
     borderBottom: "1px solid black",
   },
@@ -137,20 +156,16 @@ const InvoicePDF = ({ invoice, logoUrl, signatureUrl }: invoiceProps) => (
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableCell}>Qty</Text>
-            <Text style={[styles.tableCell, { flex: 2 }]}>Description</Text>
+            <Text style={[styles.tableCell]}>Description</Text>
             <Text style={styles.tableCell}>Price</Text>
-            <Text style={styles.tableCellRight}>Amount</Text>
+            <Text style={styles.tableCell}>Amount</Text>
           </View>
           {invoice.items.map((item, idx) => (
             <View key={idx} style={styles.tableRow}>
               <Text style={styles.tableCell}>{item.quantity}</Text>
-              <Text style={[styles.tableCell, { flex: 2 }]}>
-                {item.description}
-              </Text>
+              <Text style={[styles.tableCell]}>{item.description}</Text>
               <Text style={styles.tableCell}>{item.price}</Text>
-              <Text style={styles.tableCellRight}>
-                {item.amount.toFixed(2)}
-              </Text>
+              <Text style={styles.tableCell}>{item.amount.toFixed(2)}</Text>
             </View>
           ))}
         </View>
@@ -187,12 +202,10 @@ const InvoicePDF = ({ invoice, logoUrl, signatureUrl }: invoiceProps) => (
 
         {/* Signature */}
         <View style={styles.signatureBlock}>
-          {signatureUrl ? (
+          <View style={styles.signature}>
             <Image src={signatureUrl} style={styles.signatureImg} />
-          ) : (
-            <Text style={styles.signatureImg}></Text>
-          )}
-          <Text style={styles.signatureLabel}>Signature</Text>
+            <Text style={styles.signatureLabel}>Signature</Text>
+          </View>
         </View>
       </View>
     </Page>

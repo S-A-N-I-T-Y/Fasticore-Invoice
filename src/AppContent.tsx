@@ -3,6 +3,7 @@ import Home from "./Home";
 import CreateInvoice from "./CreateInvoice";
 import ViewInvoices from "./ViewInvoices";
 import InvoicePage from "./InvoicePage";
+import InvoicePreview from "./InvoicePreview";
 
 const AppContent = () => {
   return (
@@ -13,6 +14,7 @@ const AppContent = () => {
           <Route path="/create-invoice" element={<CreateInvoice />} />
           <Route path="/invoices" element={<ViewInvoices />} />
           <Route path="/invoice" element={<InvoicePage />} />
+          <Route path="/preview" element={<InvoicePreview />} />
         </Routes>
       </BrowserRouter>
     </div>
