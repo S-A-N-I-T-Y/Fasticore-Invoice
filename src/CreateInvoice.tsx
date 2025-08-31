@@ -79,7 +79,7 @@ const CreateInvoice = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // ✅ validate file type
+    // validate file type
     if (!file.type.startsWith("image/")) {
       toast("Please select a valid image file", {
         action: { label: "Close", onClick: () => console.log("close") },
@@ -87,7 +87,7 @@ const CreateInvoice = () => {
       return;
     }
 
-    // ✅ validate size
+    // validate size
     if (file.size > 5 * 1024 * 1024) {
       toast("File size must be less than 5MB", {
         action: { label: "Close", onClick: () => console.log("close") },
@@ -95,7 +95,7 @@ const CreateInvoice = () => {
       return;
     }
 
-    // ✅ special case: SVG → rasterize to high-quality PNG
+    // special case: SVG → rasterize to high-quality PNG
     if (file.type === "image/svg+xml") {
       const reader = new FileReader();
       reader.readAsText(file);
@@ -116,16 +116,16 @@ const CreateInvoice = () => {
             ctx.drawImage(img, 0, 0);
           }
           const pngBase64 = canvas.toDataURL("image/png");
-          setInvoice({...invoice, logoUrl: pngBase64});
+          setInvoice({ ...invoice, logoUrl: pngBase64 });
         };
         img.src = url;
       };
       return;
     }
 
-    // ✅ default: JPG, PNG, WebP, etc.
+    //  default: JPG, PNG, WebP, etc.
     const imageUrl = URL.createObjectURL(file);
-    setInvoice({...invoice, logoUrl: imageUrl});
+    setInvoice({ ...invoice, logoUrl: imageUrl });
   };
 
   const addItem = () => {
@@ -176,11 +176,30 @@ const CreateInvoice = () => {
 
   const handleSave = () => {
     dispatch(addInvoice(invoice));
-    navigate("/invoices");
+    setTimeout(() => {
+      toast("Invoice has been saved", {
+        description: "Invoice saved ",
+        action: {
+          label: "Close",
+          onClick: () => console.log("Invoice Saved"),
+        },
+      });
+      navigate("/invoices");
+    }, 1000);
   };
+
   const handleUpdate = () => {
     dispatch(updateInvoice(invoice));
-    navigate("/invoices");
+
+    setTimeout(() => {
+      toast("Invoice Updated", {
+        action: {
+          label: "close",
+          onClick: () => console.log("Invoice updated"),
+        },
+      });
+      navigate("/invoices");
+    }, 1000);
   };
 
   return (

@@ -13,7 +13,6 @@ const AppContent = () => {
           <Route path="/create-invoice" element={<CreateInvoice />} />
           <Route path="/invoices" element={<ViewInvoices />} />
           <Route path="/invoice" element={<InvoicePage />} />
-          
         </Routes>
       </BrowserRouter>
     </div>
