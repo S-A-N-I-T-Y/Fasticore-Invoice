@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import InvoicePDF from "./InvoicePDF";
 
 const InvoicePage = () => {
@@ -16,7 +16,7 @@ const InvoicePage = () => {
   const invoice: Invoice = location.state?.inv;
   console.log(invoice);
 
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   return (
     <div>
