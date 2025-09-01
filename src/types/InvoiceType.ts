@@ -27,6 +27,9 @@ export type Invoice = {
   subTotal: number;
   discount: number;
   tax: number;
+  discountAmount: number;
+  taxAmount: number;
+  total: number;
   logoUrl: string;
   signatureUrl: string;
 };

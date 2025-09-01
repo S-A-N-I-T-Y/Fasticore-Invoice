@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import InvoicePDF from "./InvoicePDF";
 
 const InvoicePage = () => {
@@ -16,7 +16,7 @@ const InvoicePage = () => {
   const invoice: Invoice = location.state?.inv;
   console.log(invoice);
 
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -65,7 +65,7 @@ const InvoicePage = () => {
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="border">
                 {invoice.items.map((invItem, index) => (
                   <TableRow key={index}>
                     <TableCell>{invItem.quantity}</TableCell>
@@ -117,13 +117,13 @@ const InvoicePage = () => {
                 </span>
               </div>
               <div className="flex justify-between gap-2 font-medium text ">
-                <p className="uppercase ">Discount:</p>
+                <p className="uppercase ">Discount({invoice.discount}%):</p>
                 <span className=" hover:outline-2 outline-gray-300 w-full text-right">
                   {invoice.discount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between gap-2 font-medium">
-                <p className="uppercase ">Tax:</p>
+                <p className="uppercase ">Tax({invoice.tax}%):</p>
                 <span className="w-full text-right  ">
                   {invoice.tax.toFixed(2)}
                 </span>
@@ -132,14 +132,14 @@ const InvoicePage = () => {
           </div>
 
           <div className="flex items-center justify-between px-5">
-            {/* <button
+            <button
               onClick={() => navigate("/preview", { state: { invoice } })}
               className="bg-blue-400 font-bold px-3 py-1.5 mt-4  rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-500"
             >
               Download PDF
-            </button> */}
+            </button>
 
-            <PDFDownloadLink
+            {/* <PDFDownloadLink
               className="bg-blue-400 font-bold px-3 py-1.5 mt-4  rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-500"
               document={
                 <InvoicePDF
@@ -151,7 +151,7 @@ const InvoicePage = () => {
               fileName={`Invoice-${invoice.id}.pdf`}
             >
               {({ loading }) => (loading ? "loading Document" : "Download PDF")}
-            </PDFDownloadLink>
+            </PDFDownloadLink> */}
 
             <div>
               <div className="border-b">

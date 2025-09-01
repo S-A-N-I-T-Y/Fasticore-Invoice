@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Invoice, Item } from "./types/InvoiceType";
 import {
   Table,
@@ -61,6 +61,9 @@ const CreateInvoice = () => {
       subTotal: 0,
       discount: 0,
       tax: 0,
+      discountAmount: 0,
+      taxAmount: 0,
+      total: 0,
       logoUrl: "",
       signatureUrl: "",
     };
@@ -106,7 +109,7 @@ const CreateInvoice = () => {
 
         const img = new Image();
         img.onload = () => {
-          const scale = 4; // 🔥 upscale factor to keep it crisp
+          const scale = 4;
           const canvas = document.createElement("canvas");
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
@@ -139,7 +142,11 @@ const CreateInvoice = () => {
   };
 
   const updateFields = (field: keyof Invoice, value: string) => {
-    setInvoice({ ...invoice, [field]: value });
+    if (field === "discount" || field === "tax") {
+      let newValue = Number(value);
+      setInvoice({ ...invoice, [field]: newValue });
+    }
+    // setInvoice({ ...invoice, [field]: value });
   };
 
   const updateItems = (index: number, field: keyof Item, value: string) => {
@@ -155,17 +162,39 @@ const CreateInvoice = () => {
 
     newItems[index] = item;
 
-    const total = newItems.reduce((a, b) => a + Number(b.amount), 0);
+    // const total = newItems.reduce((a, b) => a + Number(b.amount), 0);
 
-    setInvoice({ ...invoice, items: newItems, subTotal: total });
+    setInvoice({ ...invoice, items: newItems });
   };
 
   const deleteItems = (index: number) => {
     const updatedItems = invoice.items.filter((_, i) => i !== index);
-    const newSubtotal = updatedItems.reduce((a, b) => a + Number(b.amount), 0);
+    // const newSubtotal = updatedItems.reduce((a, b) => a + Number(b.amount), 0);
 
-    setInvoice({ ...invoice, items: updatedItems, subTotal: newSubtotal });
+    setInvoice({ ...invoice, items: updatedItems });
   };
+
+  useEffect(() => {
+    const subTotal = invoice.items.reduce((a, b) => a + Number(b.amount), 0);
+
+    let discountAmount = 0;
+
+    discountAmount = (invoice.discount * subTotal) / 100;
+
+    discountAmount = Math.min(discountAmount, subTotal);
+
+    const taxableAmount = subTotal - discountAmount;
+    const taxAmount = (taxableAmount * invoice.tax) / 100;
+
+    const total = taxableAmount + taxAmount;
+    setInvoice({
+      ...invoice,
+      subTotal,
+      discountAmount,
+      taxAmount,
+      total,
+    });
+  }, [invoice.discount, invoice.items, invoice.tax]);
 
   const generateCanvasUrl = () => {
     if (sigCanvas.current) {
@@ -205,7 +234,7 @@ const CreateInvoice = () => {
   return (
     <div>
       <div className="flex justify-center px-5 py-5 items-center min-h-screen">
-        <div className="max-w-[550px] shadow-lg rounded-lg py-5">
+        <div className="max-w-[550px] border-2 shadow-lg rounded-lg py-5">
           <div className="flex justify-between items-center p-3 mx-5 mb-4 border bg-blue-400">
             <h3
               className="text-xl font-semibold lg:text-2xl px-2 py-1 text-white rounded hover:outline-2 outline-gray-300"
@@ -279,7 +308,7 @@ const CreateInvoice = () => {
             </div>
           </div>
 
-          <div className="mb-4 px-5">
+          <div className="mb-2 px-5">
             <Table className="table-fixed w-full mb-2">
               <TableHeader>
                 <TableRow className="bg-blue-400">
@@ -292,11 +321,11 @@ const CreateInvoice = () => {
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="border">
                 {invoice.items.map((invItem, index) => (
                   <TableRow key={index}>
                     <TableCell
-                      className="hover:outline-2 outline-gray-300"
+                      className="hover:outline-blue-300 hover:outline"
                       suppressContentEditableWarning
                       contentEditable
                       onBlur={(e) =>
@@ -310,6 +339,7 @@ const CreateInvoice = () => {
                       {invItem.quantity}
                     </TableCell>
                     <TableCell
+                      className="overflow-hidden overflow-ellipsis whitespace-nowrap  hover:outline-blue-300 hover:outline"
                       suppressContentEditableWarning
                       contentEditable
                       onBlur={(e) =>
@@ -319,12 +349,12 @@ const CreateInvoice = () => {
                           e.currentTarget.textContent || ""
                         )
                       }
-                      className="overflow-hidden overflow-ellipsis whitespace-nowrap hover:outline-2 outline-gray-300"
                     >
                       {invItem.description}
                     </TableCell>
+
                     <TableCell
-                      className=" hover:outline-2 outline-gray-300"
+                      className=" hover:outline-blue-300 hover:outline"
                       suppressContentEditableWarning
                       contentEditable
                       onBlur={(e) =>
@@ -352,7 +382,7 @@ const CreateInvoice = () => {
                     <TableCell className="flex justify-end">
                       <Trash2
                         onClick={() => deleteItems(index)}
-                        className="cursor-pointer"
+                        className="cursor-pointer hover:text-red-400 transition-all duration-200 "
                         size={20}
                       />
                     </TableCell>
@@ -360,9 +390,50 @@ const CreateInvoice = () => {
                 ))}
               </TableBody>
             </Table>
-            <button className="cursor-pointer mt-2" onClick={() => addItem()}>
-              <PlusIcon size={20} />
+            <button
+              className="cursor-pointer mt-2 inline-flex text-blue-400"
+              onClick={() => addItem()}
+            >
+              <PlusIcon size={20} /> Add Item
             </button>
+          </div>
+
+          <div className="mb-4 px-5">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Discount (%)</TableHead>
+                  <TableHead>Tax (%)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    onBlur={(e) =>
+                      updateFields(
+                        "discount",
+                        e.currentTarget.textContent || ""
+                      )
+                    }
+                    contentEditable
+                    suppressContentEditableWarning
+                    className="border-2 w-1/2"
+                  >
+                    {invoice.discount}
+                  </TableCell>
+                  <TableCell
+                    onBlur={(e) =>
+                      updateFields("tax", e.currentTarget.textContent || "")
+                    }
+                    contentEditable
+                    suppressContentEditableWarning
+                    className="border-2 w-1/2 "
+                  >
+                    {invoice.tax}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </div>
 
           <div className="flex justify-between mb-4 px-5 text-sm lg:text-base">
@@ -418,31 +489,38 @@ const CreateInvoice = () => {
               </div>
             </div>
 
-            <div>
-              <div className="flex justify-between gap-2 font-medium ">
+            <div className="text-[13px]">
+              <div className="flex justify-between gap-2  ">
                 <p className="uppercase ">sub-total:</p>
                 <span className=" text-right">
                   {invoice.subTotal.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between gap-2 font-medium text ">
-                <p className="uppercase ">Discount:</p>
+              <div className="flex justify-between gap-2">
+                <p className="uppercase ">Discount({invoice.discount}%):</p>
                 <span
                   className=" hover:outline-2 outline-gray-300 w-full text-right"
                   suppressContentEditableWarning
                   contentEditable
                 >
-                  {invoice.discount.toFixed(2)}
+                  {invoice.discountAmount.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between gap-2 font-medium">
-                <p className="uppercase ">Tax:</p>
+              <div className="flex justify-between gap-2  mb-4">
+                <p className="uppercase ">Tax({invoice.tax}%):</p>
                 <span
                   suppressContentEditableWarning
                   contentEditable
                   className="w-full text-right  hover:outline-2 outline-gray-300"
                 >
-                  {invoice.tax.toFixed(2)}
+                  {invoice.taxAmount.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex justify-between gap-2 font-medium bg-gray-200 px-6 py-2 text-base">
+                <p className="uppercase ">Total:</p>
+                <span className="w-full text-right ">
+                  {invoice.total.toFixed(2)}
                 </span>
               </div>
             </div>

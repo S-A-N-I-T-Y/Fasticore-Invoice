@@ -97,9 +97,21 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
   },
   totals: {
-    fontSize: 10,
-    fontWeight: "bold",
+    fontSize: 7,
     marginBottom: 3,
+    display: "flex",
+    gap: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  total: {
+    fontSize: 8,
+    marginTop: 10,
+    fontWeight: "bold",
+    backgroundColor: "#e5e7eb",
+    padding: 6,
+    display: "flex",
+    gap: 4,
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -190,12 +202,16 @@ const InvoicePDF = ({ invoice, logoUrl, signatureUrl }: invoiceProps) => (
               <Text>{invoice.subTotal.toFixed(2)}</Text>
             </View>
             <View style={styles.totals}>
-              <Text>DISCOUNT:</Text>
-              <Text>{invoice.discount.toFixed(2)}</Text>
+              <Text>DISCOUNT({invoice.discount}%):</Text>
+              <Text>{invoice.discountAmount.toFixed(2)}</Text>
             </View>
             <View style={styles.totals}>
-              <Text>TAX:</Text>
-              <Text>{invoice.tax.toFixed(2)}</Text>
+              <Text>TAX({invoice.tax}%):</Text>
+              <Text>{invoice.taxAmount.toFixed(2)}</Text>
+            </View>
+            <View style={styles.total}>
+              <Text>TOTAL:</Text>
+              <Text>{invoice.total.toFixed(2)}</Text>
             </View>
           </View>
         </View>
