@@ -64,8 +64,8 @@ const CreateInvoice = () => {
       discountAmount: 0,
       taxAmount: 0,
       total: 0,
-      logoUrl: "",
-      signatureUrl: "",
+      logoUrl: "String",
+      signatureUrl: "String",
     };
   });
 

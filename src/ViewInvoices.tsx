@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { deleteInvoice } from "./store/InvoiceSlice";
-import { Edit2,Trash2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "./store/store";
 import { PDFDownloadLink } from "@react-pdf/renderer";
