@@ -136,7 +136,7 @@ const CreateInvoice = () => {
       ...invoice,
       items: [
         ...invoice.items,
-        { quantity: 0, description: "", price: 0, amount: 0 },
+        { quantity: 0, description: "", price: 0, amount: 0, name: "" },
       ],
     });
   };
@@ -147,6 +147,47 @@ const CreateInvoice = () => {
       setInvoice({ ...invoice, [field]: newValue });
     }
     // setInvoice({ ...invoice, [field]: value });
+  };
+
+  // Handle key press to prevent invalid characters in real-time
+  const handleKeyPress = (
+    e: React.KeyboardEvent<HTMLTableDataCellElement>,
+    field: keyof Item | keyof Invoice
+  ) => {
+    const char = e.key;
+    const currentValue = e.currentTarget.textContent || "";
+
+    // Allow control keys (backspace, delete, arrow keys, etc.)
+    if (
+      e.ctrlKey ||
+      e.metaKey ||
+      e.altKey ||
+      [
+        "Backspace",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
+        "Tab",
+        "Enter",
+      ].includes(char)
+    ) {
+      return;
+    }
+
+    // For numeric fields, only allow numbers and decimal point
+    if (
+      field === "quantity" ||
+      field === "price" ||
+      field === "discount" ||
+      field === "tax"
+    ) {
+      const isNumber = /[0-9]/.test(char);
+      const isDecimal = char === "." && !currentValue.includes(".");
+
+      if (!isNumber && !isDecimal) {
+        e.preventDefault();
+      }
+    }
   };
 
   const updateItems = (index: number, field: keyof Item, value: string) => {
@@ -233,9 +274,9 @@ const CreateInvoice = () => {
 
   return (
     <div>
-      <div className="flex justify-center px-5 py-5 items-center min-h-screen">
-        <div className="max-w-[550px] border-2 shadow-lg rounded-lg py-5">
-          <div className="flex justify-between items-center p-3 mx-5 mb-4 border bg-blue-400">
+      <div className="flex justify-center px-5 py-5 items-center min-h-screen bg-fasticore-blue">
+        <div className="max-w-[550px] border-2 shadow-lg rounded-lg py-5 bg-white">
+          <div className="flex justify-between items-center p-3 mx-5 mb-4 border bg-fasticore-blue">
             <h3
               className="text-xl font-semibold lg:text-2xl px-2 py-1 text-white rounded hover:outline-2 outline-gray-300"
               onBlur={(e) =>
@@ -311,10 +352,11 @@ const CreateInvoice = () => {
           <div className="mb-2 px-5">
             <Table className="table-fixed w-full mb-2">
               <TableHeader>
-                <TableRow className="bg-blue-400">
+                <TableRow className="bg-fasticore-blue">
+                  <TableHead className="text-white">Name</TableHead>
                   <TableHead className="text-white">Qty</TableHead>
-                  <TableHead className="w-[100px] lg:w-[200px] text-white">
-                    Desription
+                  <TableHead className=" lg:w-[150px] text-white">
+                    Des
                   </TableHead>
                   <TableHead className="text-white">Price</TableHead>
                   <TableHead className="text-white">Amount</TableHead>
@@ -323,11 +365,30 @@ const CreateInvoice = () => {
               </TableHeader>
               <TableBody className="border">
                 {invoice.items.map((invItem, index) => (
-                  <TableRow key={index}>
+                  <TableRow
+                    key={index}
+                    className={index % 2 !== 0 ? `bg-gray-300` : ""}
+                  >
                     <TableCell
-                      className="hover:outline-blue-300 hover:outline"
+                      className="overflow-hidden overflow-ellipsis whitespace-nowrap hover:outline-blue-300 hover:outline "
                       suppressContentEditableWarning
                       contentEditable
+                      onKeyDown={(e) => handleKeyPress(e, "name")}
+                      onBlur={(e) =>
+                        updateItems(
+                          index,
+                          "name",
+                          e.currentTarget.textContent || ""
+                        )
+                      }
+                    >
+                      {invItem.name}
+                    </TableCell>
+                    <TableCell
+                      className="hover:outline-blue-300 hover:outline "
+                      suppressContentEditableWarning
+                      contentEditable
+                      onKeyDown={(e) => handleKeyPress(e, "quantity")}
                       onBlur={(e) =>
                         updateItems(
                           index,
@@ -357,6 +418,7 @@ const CreateInvoice = () => {
                       className=" hover:outline-blue-300 hover:outline"
                       suppressContentEditableWarning
                       contentEditable
+                      onKeyDown={(e) => handleKeyPress(e, "price")}
                       onBlur={(e) =>
                         updateItems(
                           index,
@@ -391,7 +453,7 @@ const CreateInvoice = () => {
               </TableBody>
             </Table>
             <button
-              className="cursor-pointer mt-2 inline-flex text-blue-400"
+              className="cursor-pointer mt-2 inline-flex text-fasticore-blue"
               onClick={() => addItem()}
             >
               <PlusIcon size={20} /> Add Item
@@ -409,6 +471,7 @@ const CreateInvoice = () => {
               <TableBody>
                 <TableRow>
                   <TableCell
+                    onKeyDown={(e) => handleKeyPress(e, "discount")}
                     onBlur={(e) =>
                       updateFields(
                         "discount",
@@ -422,6 +485,7 @@ const CreateInvoice = () => {
                     {invoice.discount}
                   </TableCell>
                   <TableCell
+                    onKeyDown={(e) => handleKeyPress(e, "tax")}
                     onBlur={(e) =>
                       updateFields("tax", e.currentTarget.textContent || "")
                     }
@@ -530,14 +594,14 @@ const CreateInvoice = () => {
             {editingInvoice ? (
               <button
                 onClick={() => handleUpdate()}
-                className="bg-blue-400 font-bold px-3 py-1.5 mt-4 rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-500"
+                className="bg-blue-500 font-bold px-3 py-1.5 mt-4 rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-600"
               >
                 update
               </button>
             ) : (
               <button
                 onClick={() => handleSave()}
-                className="bg-blue-400 font-bold px-3 py-1.5 mt-4  rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-500"
+                className="bg-blue-500 font-bold px-3 py-1.5 mt-4  rounded text-white cursor-pointer transition-colors duration-300 hover:bg-blue-600"
               >
                 Save
               </button>

@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { deleteInvoice } from "./store/InvoiceSlice";
-import { Edit2, Eye, Trash2 } from "lucide-react";
+import { Edit2,Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "./store/store";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InvoicePDF from "./InvoicePDF";
+import { Download } from "lucide-react";
 
 const ViewInvoices = () => {
   const { invoices } = useSelector((state: RootState) => state.invoices);
@@ -15,7 +18,7 @@ const ViewInvoices = () => {
           <p className="text-base font-semibold lg:text-3xl">Saved Invoices</p>
           <button
             onClick={() => navigate("/create-invoice")}
-            className="bg-blue-400 text-white p-3 py-1 rounded cursor-pointer transition-all duration-500 hover:scale-95"
+            className="bg-fasticore-blue font-bold text-white px-3 py-2 rounded cursor-pointer transition-all duration-500 hover:scale-95"
           >
             Create Invoice
           </button>
@@ -28,16 +31,16 @@ const ViewInvoices = () => {
               <p>Invoices Found: {invoices.length}</p>
             )}
           </div>
-          <div>
+          <div className="flex flex-col items-center">
             {invoices.map((inv) => (
               <div
                 key={inv.id}
-                className="flex justify-between shadow-lg rounded-lg p-4 mb-4 lg:p-6 transition-all duration-700 hover:scale-[.98] cursor-pointer"
+                className="flex w-[100%] md:w-[80%] lg:w-[60%] border justify-between shadow-lg rounded-lg p-4 mb-4 lg:p-10 transition-all duration-700 hover:scale-[.98] cursor-pointer"
               >
                 <div>
                   <span>{inv.invoiceNo}</span>-<span>{inv.to.name}</span>
                 </div>
-                <div className="flex gap-2 text-sm lg:gap-5">
+                <div className="flex items-center gap-2 text-sm lg:gap-5">
                   <Trash2
                     onClick={() => dispatch(deleteInvoice(inv.id))}
                     size={20}
@@ -50,11 +53,23 @@ const ViewInvoices = () => {
                     }
                     className="text-amber-500 transition-all animation-duration-initial hover:animate-pulse"
                   />
-                  <Eye
-                    onClick={() => navigate("/invoice", { state: { inv } })}
-                    size={20}
-                    className="text-blue-400 transition-all animation-duration-initial hover:animate-caret-blink"
-                  />
+                  <Download className=" rounded text-blue-300 cursor-pointer transition-colors duration-300 hover:text-blue-500">
+                    <PDFDownloadLink
+                      className=""
+                      document={
+                        <InvoicePDF
+                          invoice={inv}
+                          logoUrl={inv.logoUrl}
+                          signatureUrl={inv.signatureUrl}
+                        />
+                      }
+                      fileName={`Invoice-${inv.id}.pdf`}
+                    >
+                      {({ loading }) =>
+                        loading ? "loading Document" : "Download PDF"
+                      }
+                    </PDFDownloadLink>
+                  </Download>
                 </div>
               </div>
             ))}

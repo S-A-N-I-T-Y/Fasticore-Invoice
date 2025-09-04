@@ -3,6 +3,7 @@ export type Item = {
   description: string;
   price: number;
   amount: number;
+  name: string
 };
 export type From = {
   name: string;

@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { BlobProvider } from "@react-pdf/renderer";
 import { useLocation } from "react-router-dom";
 import InvoicePDF from "./InvoicePDF";
 
